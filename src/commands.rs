@@ -591,7 +591,16 @@ fn attach_with_session_name(
     }
 }
 
-pub(crate) fn start_client(opts: CliArgs) {
+pub(crate) fn start_client(mut opts: CliArgs) {
+    // Promote local --layout from attach subcommand to global opts.layout
+    // Local takes precedence over global
+    // Must happen BEFORE convert_old_yaml_files which checks opts.layout
+    if let Some(Command::Sessions(Sessions::Attach { ref layout, .. })) = opts.command.as_ref() {
+        if let Some(local_layout) = layout {
+            opts.layout = Some(local_layout.clone());
+        }
+    }
+
     // look for old YAML config/layout/theme files and convert them to KDL
     convert_old_yaml_files(&opts);
     let (
@@ -643,6 +652,7 @@ pub(crate) fn start_client(opts: CliArgs) {
                     force_run_commands: false,
                     index: None,
                     options: None,
+                    layout: None,
                     token: None,
                     remember: false,
                     forget: false,
@@ -675,6 +685,7 @@ pub(crate) fn start_client(opts: CliArgs) {
             force_run_commands,
             index,
             options,
+            layout: _,
             token,
             remember,
             forget,

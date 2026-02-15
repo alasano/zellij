@@ -265,6 +265,10 @@ pub enum Sessions {
         #[clap(short, long, value_parser, takes_value(false), default_value("false"))]
         force_run_commands: bool,
 
+        /// Name of a predefined layout inside the layout directory or the path to a layout file
+        #[clap(short, long, value_parser, overrides_with = "layout")]
+        layout: Option<PathBuf>,
+
         /// Authentication token for remote sessions
         #[clap(short('t'), long, value_parser)]
         token: Option<String>,
